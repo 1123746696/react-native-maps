@@ -14,7 +14,7 @@
 #import "UIView+React.h"
 #import "AIRMapMarker.h"
 
-@interface AIRMapMarkerManager () <MKMapViewDelegate>
+@interface AIRMapMarkerManager () <BMKMapViewDelegate>
 
 @end
 

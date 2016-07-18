@@ -4,7 +4,7 @@
 //
 
 #import <CoreLocation/CoreLocation.h>
-#import <MapKit/MapKit.h>
+#import <BaiduMapAPI_Map/BMKMapComponent.h>  
 #import "RCTConvert.h"
 
 @interface RCTConvert (MoreMapKit)

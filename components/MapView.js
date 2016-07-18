@@ -22,7 +22,7 @@ var MapPolyline = require('./MapPolyline');
 var MapPolygon = require('./MapPolygon');
 var MapCircle = require('./MapCircle');
 var MapCallout = require('./MapCallout');
-
+const  BMapManager = require('../js/BMapManager');
 var MapView = React.createClass({
   mixins: [NativeMethodsMixin],
 
@@ -32,7 +32,9 @@ var MapView = React.createClass({
       region: true,
     },
   },
-
+  statics: {
+    BMapManager,
+  },
   propTypes: {
     ...View.propTypes,
     /**

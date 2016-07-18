@@ -5,7 +5,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <MapKit/MapKit.h>
+#import <BaiduMapAPI_Map/BMKMapComponent.h>
 #import <UIKit/UIKit.h>
 
 #import "RCTConvert+MapKit.h"
@@ -15,7 +15,7 @@
 #import "RCTView.h"
 
 
-@interface AIRMapPolyline: MKAnnotationView <MKOverlay>
+@interface AIRMapPolyline: BMKAnnotationView <MKOverlay>
 
 @property (nonatomic, weak) AIRMap *map;
 

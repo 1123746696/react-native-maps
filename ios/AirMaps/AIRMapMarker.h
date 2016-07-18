@@ -10,7 +10,7 @@
 #import "AIRMapMarker.h"
 #import "AIRMapCallout.h"
 
-#import <MapKit/MapKit.h>
+#import <BaiduMapAPI_Map/BMKMapComponent.h>
 #import <UIKit/UIKit.h>
 
 #import "RCTConvert+MapKit.h"
@@ -20,7 +20,7 @@
 
 @class RCTBridge;
 
-@interface AIRMapMarker : MKAnnotationView <MKAnnotation>
+@interface AIRMapMarker : BMKAnnotationView <MKAnnotation>
 
 @property (nonatomic, strong) AIRMapCallout *calloutView;
 @property (nonatomic, weak) AIRMap *map;

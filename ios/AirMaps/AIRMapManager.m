@@ -25,12 +25,29 @@
 #import "AIRMapCircle.h"
 #import "SMCalloutView.h"
 
-#import <MapKit/MapKit.h>
+#import <BaiduMapAPI_Map/BMKMapComponent.h>  
+
+
+NS_INLINE BMKCoordinateSpan BMKCoordinateSpanMake(MKCoordinateSpan span)
+{
+    BMKCoordinateSpan newSpan;
+    newSpan.latitudeDelta = span.latitudeDelta;
+    newSpan.longitudeDelta = span.longitudeDelta;
+    return newSpan;
+}
+
+NS_INLINE BMKCoordinateRegion BMKCoordinateRegionMake(MKCoordinateRegion region)
+{
+    BMKCoordinateRegion newRegion;
+    newRegion.center = region.center;
+    newRegion.span = BMKCoordinateSpanMake(region.span);
+    return newRegion;
+}
 
 static NSString *const RCTMapViewKey = @"MapView";
 
 
-@interface AIRMapManager() <MKMapViewDelegate>
+@interface AIRMapManager() <BMKMapViewDelegate>
 
 @end
 
@@ -96,14 +113,15 @@ RCT_EXPORT_VIEW_PROPERTY(onMarkerDragEnd, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onCalloutPress, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(initialRegion, MKCoordinateRegion)
 
-RCT_CUSTOM_VIEW_PROPERTY(region, MKCoordinateRegion, AIRMap)
+RCT_CUSTOM_VIEW_PROPERTY(region, BMKCoordinateRegion, AIRMap)
 {
     if (json == nil) return;
 
     // don't emit region change events when we are setting the region
     BOOL originalIgnore = view.ignoreRegionChanges;
     view.ignoreRegionChanges = YES;
-    [view setRegion:[RCTConvert MKCoordinateRegion:json] animated:NO];
+    
+    [view setRegion:BMKCoordinateRegionMake([RCTConvert MKCoordinateRegion:json]) animated:NO];
     view.ignoreRegionChanges = originalIgnore;
 }
 
@@ -111,7 +129,7 @@ RCT_CUSTOM_VIEW_PROPERTY(region, MKCoordinateRegion, AIRMap)
 #pragma mark exported MapView methods
 
 RCT_EXPORT_METHOD(animateToRegion:(nonnull NSNumber *)reactTag
-        withRegion:(MKCoordinateRegion)region
+        withRegion:(BMKCoordinateRegion)region
         withDuration:(CGFloat)duration)
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
@@ -136,7 +154,7 @@ RCT_EXPORT_METHOD(animateToCoordinate:(nonnull NSNumber *)reactTag
             RCTLogError(@"Invalid view returned from registry, expecting AIRMap, got: %@", view);
         } else {
             AIRMap *mapView = (AIRMap *)view;
-            MKCoordinateRegion region;
+            BMKCoordinateRegion region;
             region.span = mapView.region.span;
             region.center = latlng;
             [AIRMap animateWithDuration:duration/1000 animations:^{
@@ -327,40 +345,38 @@ RCT_EXPORT_METHOD(takeSnapshot:(nonnull NSNumber *)reactTag
 
 
 
-- (void)mapView:(AIRMap *)mapView didSelectAnnotationView:(MKAnnotationView *)view
+- (void)mapView:(AIRMap *)mapView didSelectAnnotationView:(BMKAnnotationView *)view
 {
     if ([view.annotation isKindOfClass:[AIRMapMarker class]]) {
         [(AIRMapMarker *)view.annotation showCalloutView];
     }
 }
 
-- (void)mapView:(AIRMap *)mapView didDeselectAnnotationView:(MKAnnotationView *)view {
+- (void)mapView:(AIRMap *)mapView didDeselectAnnotationView:(BMKAnnotationView *)view {
     if ([view.annotation isKindOfClass:[AIRMapMarker class]]) {
         [(AIRMapMarker *)view.annotation hideCalloutView];
     }
 }
-
-- (MKAnnotationView *)mapView:(__unused AIRMap *)mapView viewForAnnotation:(AIRMapMarker *)marker
+- (BMKAnnotationView *)mapView:(__unused AIRMap *)mapView viewForAnnotation:(id <BMKAnnotation>)marker
 {
     if (![marker isKindOfClass:[AIRMapMarker class]]) {
         return nil;
     }
-
-    marker.map = mapView;
-    return [marker getAnnotationView];
+    ((AIRMapMarker *)marker).map = mapView;
+    return [((AIRMapMarker *)marker) getAnnotationView];
 }
 
 static int kDragCenterContext;
 
 - (void)mapView:(AIRMap *)mapView
-    annotationView:(MKAnnotationView *)view
-    didChangeDragState:(MKAnnotationViewDragState)newState
-    fromOldState:(MKAnnotationViewDragState)oldState
+    annotationView:(BMKAnnotationView *)view
+    didChangeDragState:(BMKAnnotationViewDragState)newState
+    fromOldState:(BMKAnnotationViewDragState)oldState
 {
     if (![view.annotation isKindOfClass:[AIRMapMarker class]]) return;
     AIRMapMarker *marker = (AIRMapMarker *)view.annotation;
 
-    BOOL isPinView = [view isKindOfClass:[MKPinAnnotationView class]];
+    BOOL isPinView = [view isKindOfClass:[BMKPinAnnotationView class]];
 
     id event = @{
                  @"id": marker.identifier ?: @"unknown",
@@ -372,7 +388,7 @@ static int kDragCenterContext;
 
     if (newState == MKAnnotationViewDragStateEnding || newState == MKAnnotationViewDragStateCanceling) {
         if (!isPinView) {
-            [view setDragState:MKAnnotationViewDragStateNone animated:NO];
+            [view setDragState:BMKAnnotationViewDragStateNone];
         }
         if (mapView.onMarkerDragEnd) mapView.onMarkerDragEnd(event);
         if (marker.onDragEnd) marker.onDragEnd(event);
@@ -428,10 +444,11 @@ static int kDragCenterContext;
     }
 }
 
+
 - (void)mapView:(AIRMap *)mapView didUpdateUserLocation:(MKUserLocation *)location
 {
     if (mapView.followUserLocation) {
-        MKCoordinateRegion region;
+        BMKCoordinateRegion region;
         region.span.latitudeDelta = AIRMapDefaultSpan;
         region.span.longitudeDelta = AIRMapDefaultSpan;
         region.center = location.coordinate;
@@ -441,7 +458,6 @@ static int kDragCenterContext;
         // mapView.followUserLocation = NO;
     }
 }
-
 - (void)mapView:(AIRMap *)mapView regionWillChangeAnimated:(__unused BOOL)animated
 {
     [self _regionChanged:mapView];
@@ -496,7 +512,7 @@ static int kDragCenterContext;
 {
     BOOL needZoom = NO;
     CGFloat newLongitudeDelta = 0.0f;
-    MKCoordinateRegion region = mapView.region;
+    BMKCoordinateRegion region = mapView.region;
     // On iOS 7, it's possible that we observe invalid locations during initialization of the map.
     // Filter those out.
     if (!CLLocationCoordinate2DIsValid(region.center)) {
@@ -524,7 +540,7 @@ static int kDragCenterContext;
 - (void)_emitRegionChangeEvent:(AIRMap *)mapView continuous:(BOOL)continuous
 {
     if (!mapView.ignoreRegionChanges && mapView.onChange) {
-        MKCoordinateRegion region = mapView.region;
+        BMKCoordinateRegion region = mapView.region;
         if (!CLLocationCoordinate2DIsValid(region.center)) {
             return;
         }
@@ -541,5 +557,6 @@ static int kDragCenterContext;
         });
     }
 }
+
 
 @end

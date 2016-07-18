@@ -4,7 +4,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <MapKit/MapKit.h>
+#import <BaiduMapAPI_Map/BMKMapComponent.h>
 
 @interface AIRMapCoordinate : NSObject
 

@@ -22,7 +22,7 @@ const NSTimeInterval AIRMapRegionChangeObserveInterval = 0.1;
 const CGFloat AIRMapZoomBoundBuffer = 0.01;
 
 
-@interface MKMapView (UIGestureRecognizer)
+@interface BMKMapView (UIGestureRecognizer)
 
 // this tells the compiler that MKMapView actually implements this method
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
@@ -200,7 +200,7 @@ const CGFloat AIRMapZoomBoundBuffer = 0.01;
     }
 }
 
-- (void)setRegion:(MKCoordinateRegion)region animated:(BOOL)animated
+- (void)setRegion:(BMKCoordinateRegion)region animated:(BOOL)animated
 {
     // If location is invalid, abort
     if (!CLLocationCoordinate2DIsValid(region.center)) {
@@ -219,7 +219,7 @@ const CGFloat AIRMapZoomBoundBuffer = 0.01;
     [super setRegion:region animated:animated];
 }
 
-- (void)setInitialRegion:(MKCoordinateRegion)initialRegion {
+- (void)setInitialRegion:(BMKCoordinateRegion)initialRegion {
     if (!_initialRegionSet) {
         _initialRegionSet = YES;
         [self setRegion:initialRegion animated:NO];
@@ -271,45 +271,34 @@ const CGFloat AIRMapZoomBoundBuffer = 0.01;
 // and check if their selector is available before calling super method.
 
 - (void)setShowsCompass:(BOOL)showsCompass {
-    if ([MKMapView instancesRespondToSelector:@selector(setShowsCompass:)]) {
-        [super setShowsCompass:showsCompass];
-    }
+//    if ([MKMapView instancesRespondToSelector:@selector(setShowsCompass:)]) {
+//        [super setShowsCompass:showsCompass];
+//    }
 }
 
 - (BOOL)showsCompass {
-    if ([MKMapView instancesRespondToSelector:@selector(showsCompass)]) {
-        return [super showsCompass];
-    } else {
-        return NO;
-    }
+//    if ([MKMapView instancesRespondToSelector:@selector(showsCompass)]) {
+//        return [super showsCompass];
+//    } else {
+//        return NO;
+//    }
+    return true;
 }
 
 - (void)setShowsScale:(BOOL)showsScale {
-    if ([MKMapView instancesRespondToSelector:@selector(setShowsScale:)]) {
-        [super setShowsScale:showsScale];
-    }
+    self.showMapScaleBar=showsScale;
 }
 
 - (BOOL)showsScale {
-    if ([MKMapView instancesRespondToSelector:@selector(showsScale)]) {
-        return [super showsScale];
-    } else {
-        return NO;
-    }
+    return self.showMapScaleBar;
 }
 
 - (void)setShowsTraffic:(BOOL)showsTraffic {
-    if ([MKMapView instancesRespondToSelector:@selector(setShowsTraffic:)]) {
-        [super setShowsTraffic:showsTraffic];
-    }
+    self.trafficEnabled=showsTraffic;
 }
 
 - (BOOL)showsTraffic {
-    if ([MKMapView instancesRespondToSelector:@selector(showsTraffic)]) {
-        return [super showsTraffic];
-    } else {
-        return NO;
-    }
+    return  self.isTrafficEnabled;
 }
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled {

@@ -7,9 +7,9 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-#import <MapKit/MapKit.h>
-#import <UIKit/UIKit.h>
 
+#import <UIKit/UIKit.h>
+#import <BaiduMapAPI_Map/BMKMapComponent.h>  
 #import "RCTConvert+MapKit.h"
 #import "RCTComponent.h"
 #import "SMCalloutView.h"
@@ -18,7 +18,7 @@ extern const CLLocationDegrees AIRMapDefaultSpan;
 extern const NSTimeInterval AIRMapRegionChangeObserveInterval;
 extern const CGFloat AIRMapZoomBoundBuffer;
 
-@interface AIRMap: MKMapView<SMCalloutViewDelegate>
+@interface AIRMap: BMKMapView<SMCalloutViewDelegate>
 
 @property (nonatomic, strong) SMCalloutView *calloutView;
 @property (nonatomic, strong) UIImageView *cacheImageView;
@@ -38,7 +38,7 @@ extern const CGFloat AIRMapZoomBoundBuffer;
 @property (nonatomic, assign) MKCoordinateRegion initialRegion;
 
 @property (nonatomic, assign) CLLocationCoordinate2D pendingCenter;
-@property (nonatomic, assign) MKCoordinateSpan pendingSpan;
+@property (nonatomic, assign) BMKCoordinateSpan pendingSpan;
 
 
 @property (nonatomic, assign) BOOL ignoreRegionChanges;
