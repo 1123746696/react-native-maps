@@ -58,7 +58,7 @@
     {
         coords[i] = coordinates[i].coordinate;
     }
-    self.polygon = [MKPolygon polygonWithCoordinates:coords count:coordinates.count];
+    self.polygon = [BMKPolygon polygonWithCoordinates:coords count:coordinates.count];
     // TODO: we could lazy-initialize the polygon, since we don't need it until the
     // polygon is in view.
     self.renderer = [[MKPolygonRenderer alloc] initWithPolygon:self.polygon];
@@ -89,12 +89,12 @@
     return self.polygon.coordinate;
 }
 
-- (MKMapRect) boundingMapRect
+- (BMKMapRect) boundingMapRect
 {
     return self.polygon.boundingMapRect;
 }
 
-- (BOOL)intersectsMapRect:(MKMapRect)mapRect
+- (BOOL)intersectsMapRect:(BMKMapRect)mapRect
 {
     BOOL answer = [self.polygon intersectsMapRect:mapRect];
     return answer;

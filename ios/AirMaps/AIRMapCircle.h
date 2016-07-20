@@ -20,7 +20,7 @@
 
 @property (nonatomic, weak) AIRMap *map;
 
-@property (nonatomic, strong) MKCircle *circle;
+@property (nonatomic, strong) BMKCircle *circle;
 @property (nonatomic, strong) MKCircleRenderer *renderer;
 
 @property (nonatomic, assign) CLLocationCoordinate2D centerCoordinate;
@@ -38,8 +38,8 @@
 #pragma mark MKOverlay protocol
 
 @property(nonatomic, readonly) CLLocationCoordinate2D coordinate;
-@property(nonatomic, readonly) MKMapRect boundingMapRect;
-- (BOOL)intersectsMapRect:(MKMapRect)mapRect;
+@property(nonatomic, readonly) BMKMapRect boundingMapRect;
+- (BOOL)intersectsMapRect:(BMKMapRect)mapRect;
 - (BOOL)canReplaceMapContent;
 
 @end

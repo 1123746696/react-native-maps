@@ -69,7 +69,7 @@
 - (void) createCircleAndRendererIfPossible
 {
     if (!_centerSet || !_radiusSet) return;
-    self.circle = [MKCircle circleWithCenterCoordinate:_centerCoordinate radius:_radius];
+    self.circle = [BMKCircle circleWithCenterCoordinate:_centerCoordinate radius:_radius];
     self.renderer = [[MKCircleRenderer alloc] initWithCircle:self.circle];
 }
 
@@ -98,12 +98,12 @@
     return self.circle.coordinate;
 }
 
-- (MKMapRect) boundingMapRect
+- (BMKMapRect) boundingMapRect
 {
     return self.circle.boundingMapRect;
 }
 
-- (BOOL)intersectsMapRect:(MKMapRect)mapRect
+- (BOOL)intersectsMapRect:(BMKMapRect)mapRect
 {
     BOOL answer = [self.circle intersectsMapRect:mapRect];
     return answer;

@@ -386,7 +386,7 @@ static int kDragCenterContext;
                          }
                  };
 
-    if (newState == MKAnnotationViewDragStateEnding || newState == MKAnnotationViewDragStateCanceling) {
+    if (newState == BMKAnnotationViewDragStateEnding || newState == BMKAnnotationViewDragStateCanceling) {
         if (!isPinView) {
             [view setDragState:BMKAnnotationViewDragStateNone];
         }
@@ -394,7 +394,7 @@ static int kDragCenterContext;
         if (marker.onDragEnd) marker.onDragEnd(event);
 
         [view removeObserver:self forKeyPath:@"center"];
-    } else if (newState == MKAnnotationViewDragStateStarting) {
+    } else if (newState == BMKAnnotationViewDragStateStarting) {
         // MapKit doesn't emit continuous drag events. To get around this, we are going to use KVO.
         [view addObserver:self forKeyPath:@"center" options:NSKeyValueObservingOptionNew context:&kDragCenterContext];
 
@@ -408,8 +408,8 @@ static int kDragCenterContext;
                         change:(NSDictionary *)change
                        context:(void *)context
 {
-    if ([keyPath isEqualToString:@"center"] && [object isKindOfClass:[MKAnnotationView class]]) {
-        MKAnnotationView *view = (MKAnnotationView *)object;
+    if ([keyPath isEqualToString:@"center"] && [object isKindOfClass:[BMKAnnotationView class]]) {
+        BMKAnnotationView *view = (BMKAnnotationView *)object;
         AIRMapMarker *marker = (AIRMapMarker *)view.annotation;
 
         // a marker we don't control might be getting dragged. Check just in case.
@@ -445,13 +445,13 @@ static int kDragCenterContext;
 }
 
 
-- (void)mapView:(AIRMap *)mapView didUpdateUserLocation:(MKUserLocation *)location
+- (void)mapView:(AIRMap *)mapView didUpdateUserLocation:(BMKUserLocation *)location
 {
     if (mapView.followUserLocation) {
         BMKCoordinateRegion region;
         region.span.latitudeDelta = AIRMapDefaultSpan;
         region.span.longitudeDelta = AIRMapDefaultSpan;
-        region.center = location.coordinate;
+        region.center = location.location.coordinate;
         [mapView setRegion:region animated:YES];
 
         // Move to user location only for the first time it loads up.
