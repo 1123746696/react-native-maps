@@ -18,9 +18,10 @@ public class MapsPackage implements ReactPackage {
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Collections.emptyList();
+        BMapManager   bMapManager = new BMapManager(reactContext);
+        return Arrays.<NativeModule>asList(
+                bMapManager);
     }
-
     @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
