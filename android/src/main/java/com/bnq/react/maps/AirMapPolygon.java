@@ -2,20 +2,22 @@ package com.bnq.react.maps;
 
 import android.content.Context;
 
+import com.baidu.mapapi.map.Stroke;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
-
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.map.Polygon;
+import com.baidu.mapapi.map.PolygonOptions;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.Overlay;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AirMapPolygon extends AirMapFeature {
 
-    private PolygonOptions polygonOptions;
-    private Polygon polygon;
+    private OverlayOptions polygonOptions;
+    private Overlay polygon;
 
     private List<LatLng> coordinates;
     private int strokeColor;
@@ -28,6 +30,11 @@ public class AirMapPolygon extends AirMapFeature {
         super(context);
     }
 
+    @Override
+    public void removeFromMap(BaiduMap map) {
+        polygon.remove();
+    }
+
     public void setCoordinates(ReadableArray coordinates) {
         // it's kind of a bummer that we can't run map() or anything on the ReadableArray
         this.coordinates = new ArrayList<>(coordinates.size());
@@ -37,46 +44,48 @@ public class AirMapPolygon extends AirMapFeature {
                     new LatLng(coordinate.getDouble("latitude"), coordinate.getDouble("longitude")));
         }
         if (polygon != null) {
-            polygon.setPoints(this.coordinates);
+            ((Polygon) polygon).setPoints(this.coordinates);
         }
     }
 
     public void setFillColor(int color) {
         this.fillColor = color;
         if (polygon != null) {
-            polygon.setFillColor(color);
+            ((Polygon) polygon).setFillColor(color);
         }
     }
 
     public void setStrokeColor(int color) {
         this.strokeColor = color;
+        Stroke stroke = new Stroke((int) strokeWidth, color);
         if (polygon != null) {
-            polygon.setStrokeColor(color);
+            ((Polygon) polygon).setStroke(stroke);
         }
     }
 
     public void setStrokeWidth(float width) {
         this.strokeWidth = width;
+        Stroke stroke = new Stroke((int)strokeWidth, strokeColor);
         if (polygon != null) {
-            polygon.setStrokeWidth(width);
+            ((Polygon) polygon).setStroke(stroke);
         }
     }
 
     public void setGeodesic(boolean geodesic) {
         this.geodesic = geodesic;
-        if (polygon != null) {
-            polygon.setGeodesic(geodesic);
-        }
+//        if (polygon != null) {
+//            polygon.setGeodesic(geodesic);
+//        }
     }
 
     public void setZIndex(float zIndex) {
         this.zIndex = zIndex;
         if (polygon != null) {
-            polygon.setZIndex(zIndex);
+            polygon.setZIndex((int) zIndex);
         }
     }
 
-    public PolygonOptions getPolygonOptions() {
+    public OverlayOptions getPolygonOptions() {
         if (polygonOptions == null) {
             polygonOptions = createPolygonOptions();
         }
@@ -85,12 +94,13 @@ public class AirMapPolygon extends AirMapFeature {
 
     private PolygonOptions createPolygonOptions() {
         PolygonOptions options = new PolygonOptions();
-        options.addAll(coordinates);
+        options.points(coordinates);
         options.fillColor(fillColor);
-        options.strokeColor(strokeColor);
-        options.strokeWidth(strokeWidth);
-        options.geodesic(geodesic);
-        options.zIndex(zIndex);
+
+        Stroke stroke = new Stroke((int)strokeWidth, strokeColor);
+        options.stroke(stroke);
+        //options.geodesic(geodesic);
+        options.zIndex((int) zIndex);
         return options;
     }
 
@@ -100,12 +110,7 @@ public class AirMapPolygon extends AirMapFeature {
     }
 
     @Override
-    public void addToMap(GoogleMap map) {
-        polygon = map.addPolygon(getPolygonOptions());
-    }
-
-    @Override
-    public void removeFromMap(GoogleMap map) {
-        polygon.remove();
+    public void addToMap(BaiduMap map) {
+        polygon = map.addOverlay(getPolygonOptions());
     }
 }

@@ -1,7 +1,7 @@
 package com.bnq.react.maps;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.LatLngBounds;
 
 public class LatLngBoundsUtils {
     public static boolean BoundsAreDifferent(LatLngBounds a, LatLngBounds b) {

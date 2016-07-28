@@ -11,7 +11,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.google.android.gms.maps.model.LatLng;
+import com.baidu.mapapi.model.LatLng;
 
 public class AirMapCircleManager extends ViewGroupManager<AirMapCircle> {
     private final DisplayMetrics metrics;

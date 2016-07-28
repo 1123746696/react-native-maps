@@ -15,11 +15,10 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.LatLngBounds;
+import com.baidu.mapapi.SDKInitializer;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -32,10 +31,10 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
     private static final int FIT_TO_ELEMENTS = 3;
 
     private final Map<String, Integer> MAP_TYPES = MapBuilder.of(
-            "standard", GoogleMap.MAP_TYPE_NORMAL,
-            "satellite", GoogleMap.MAP_TYPE_SATELLITE,
-            "hybrid", GoogleMap.MAP_TYPE_HYBRID,
-            "terrain", GoogleMap.MAP_TYPE_TERRAIN
+            "standard", BaiduMap.MAP_TYPE_NORMAL,
+            "satellite", BaiduMap.MAP_TYPE_SATELLITE,
+            "hybrid", 3,
+            "terrain", 4
     );
 
     private ReactContext reactContext;
@@ -56,13 +55,14 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
         reactContext = context;
 
         try {
-            MapsInitializer.initialize(this.appContext);
+            SDKInitializer.initialize(this.appContext.getApplicationContext());
         } catch (RuntimeException e) {
             e.printStackTrace();
             emitMapError("Map initialize error", "map_init_error");
         }
 
-        return new AirMapView(context, this.appContext, this);
+        AirMapView v = new AirMapView(context, appContext, this);
+        return v;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
 
     @ReactProp(name = "showsIndoors", defaultBoolean = false)
     public void setShowIndoors(AirMapView view, boolean showIndoors) {
-        view.map.setIndoorEnabled(showIndoors);
+        view.map.setIndoorEnable(showIndoors);
     }
 
     @ReactProp(name = "showsCompass", defaultBoolean = false)
@@ -165,7 +165,7 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
 
     @ReactProp(name = "pitchEnabled", defaultBoolean = false)
     public void setPitchEnabled(AirMapView view, boolean pitchEnabled) {
-        view.map.getUiSettings().setTiltGesturesEnabled(pitchEnabled);
+        view.map.getUiSettings().setScrollGesturesEnabled(pitchEnabled);
     }
 
     @Override
@@ -185,10 +185,13 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
                 lat = region.getDouble("latitude");
                 lngDelta = region.getDouble("longitudeDelta");
                 latDelta = region.getDouble("latitudeDelta");
-                LatLngBounds bounds = new LatLngBounds(
-                        new LatLng(lat - latDelta / 2, lng - lngDelta / 2), // southwest
-                        new LatLng(lat + latDelta / 2, lng + lngDelta / 2)  // northeast
-                );
+
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                LatLngBounds bounds = builder
+                        .include(new LatLng(lat - latDelta / 2, lng - lngDelta / 2))
+                        .include(new LatLng(lat + latDelta / 2, lng + lngDelta / 2))
+                        .build();
+
                 view.animateToRegion(bounds, duration);
                 break;
 

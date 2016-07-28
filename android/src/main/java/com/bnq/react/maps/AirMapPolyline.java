@@ -4,18 +4,19 @@ import android.content.Context;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.map.Polyline;
+import com.baidu.mapapi.map.PolylineOptions;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.Overlay;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AirMapPolyline extends AirMapFeature {
 
-    private PolylineOptions polylineOptions;
-    private Polyline polyline;
+    private OverlayOptions polylineOptions;
+    private Overlay polyline;
 
     private List<LatLng> coordinates;
     private int color;
@@ -35,39 +36,39 @@ public class AirMapPolyline extends AirMapFeature {
                     new LatLng(coordinate.getDouble("latitude"), coordinate.getDouble("longitude")));
         }
         if (polyline != null) {
-            polyline.setPoints(this.coordinates);
+            ((Polyline) polyline).setPoints(this.coordinates);
         }
     }
 
     public void setColor(int color) {
         this.color = color;
         if (polyline != null) {
-            polyline.setColor(color);
+            ((Polyline) polyline).setColor(color);
         }
     }
 
     public void setWidth(float width) {
         this.width = width;
         if (polyline != null) {
-            polyline.setWidth(width);
+            ((Polyline) polyline).setWidth((int) width);
         }
     }
 
     public void setZIndex(float zIndex) {
         this.zIndex = zIndex;
         if (polyline != null) {
-            polyline.setZIndex(zIndex);
+            polyline.setZIndex((int) zIndex);
         }
     }
 
     public void setGeodesic(boolean geodesic) {
         this.geodesic = geodesic;
-        if (polyline != null) {
-            polyline.setGeodesic(geodesic);
-        }
+//        if (polyline != null) {
+//            polyline.setGeodesic(geodesic);
+//        }
     }
 
-    public PolylineOptions getPolylineOptions() {
+    public OverlayOptions getPolylineOptions() {
         if (polylineOptions == null) {
             polylineOptions = createPolylineOptions();
         }
@@ -76,11 +77,11 @@ public class AirMapPolyline extends AirMapFeature {
 
     private PolylineOptions createPolylineOptions() {
         PolylineOptions options = new PolylineOptions();
-        options.addAll(coordinates);
+        options.points(coordinates);
         options.color(color);
-        options.width(width);
-        options.geodesic(geodesic);
-        options.zIndex(zIndex);
+        options.width((int) width);
+//        options.geodesic(geodesic);
+        options.zIndex((int) zIndex);
         return options;
     }
 
@@ -90,12 +91,12 @@ public class AirMapPolyline extends AirMapFeature {
     }
 
     @Override
-    public void addToMap(GoogleMap map) {
-        polyline = map.addPolyline(getPolylineOptions());
+    public void addToMap(BaiduMap map) {
+        polyline = map.addOverlay(getPolylineOptions());
     }
 
     @Override
-    public void removeFromMap(GoogleMap map) {
+    public void removeFromMap(BaiduMap map) {
         polyline.remove();
     }
 }

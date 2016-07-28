@@ -1,16 +1,27 @@
 package com.bnq.react.maps;
 
 import android.graphics.Color;
+import android.graphics.Point;
 import android.view.View;
 
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.InfoWindow;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Projection;
+import com.baidu.mapapi.model.LatLng;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.google.android.gms.maps.model.Marker;
+import com.baidu.mapapi.map.Marker;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +33,8 @@ public class AirMapMarkerManager extends ViewGroupManager<AirMapMarker> {
     public static final int SHOW_INFO_WINDOW = 1;
     public static final int HIDE_INFO_WINDOW = 2;
 
+    private ReactContext reactContext;
+
     public AirMapMarkerManager() {
     }
 
@@ -32,6 +45,7 @@ public class AirMapMarkerManager extends ViewGroupManager<AirMapMarker> {
 
     @Override
     public AirMapMarker createViewInstance(ThemedReactContext context) {
+        reactContext = context;
         return new AirMapMarker(context);
     }
 
@@ -142,13 +156,83 @@ public class AirMapMarkerManager extends ViewGroupManager<AirMapMarker> {
     public void receiveCommand(AirMapMarker view, int commandId, @Nullable ReadableArray args) {
         switch (commandId) {
             case SHOW_INFO_WINDOW:
-                ((Marker) view.getFeature()).showInfoWindow();
+//                ((Marker) view.getFeature()).showInfoWindow();
+                showWindow(view);
                 break;
 
             case HIDE_INFO_WINDOW:
-                ((Marker) view.getFeature()).hideInfoWindow();
+//                ((Marker) view.getFeature()).hideInfoWindow();
+                hideWindow(view);
                 break;
         }
+    }
+
+    private void showWindow(final AirMapMarker view) {
+        final Marker marker = (Marker) view.getFeature();
+        if (marker != null) {
+            final BaiduMap map = view.getMap();
+            if (map != null) {
+                map.hideInfoWindow();
+                InfoWindow infoWindow = new InfoWindow(
+                        BitmapDescriptorFactory.fromView(
+                                view.getInfoView()
+                        ),
+                        marker.getPosition(), 0,
+                        new InfoWindow.OnInfoWindowClickListener()
+                        {
+
+                            @Override
+                            public void onInfoWindowClick()
+                            {
+                                WritableMap event;
+//
+//                                event = makeClickEventData(marker.getPosition(), map);
+//                                event.putString("action", "callout-press");
+//                                pushEvent(mapview, "onCalloutPress", event);
+
+                                event = makeClickEventData(marker.getPosition(), map);
+                                event.putString("action", "callout-press");
+
+                                pushEvent(view, "onCalloutPress", event);
+
+                                event = makeClickEventData(marker.getPosition(), map);
+                                event.putString("action", "callout-press");
+                                AirMapCallout infoWindow = view.getCalloutView();
+                                if (infoWindow != null) {
+                                    pushEvent(infoWindow, "onPress", event);
+                                }
+                            }
+                        });
+                //显示InfoWindow
+                map.showInfoWindow(infoWindow);
+            }
+        }
+    }
+
+    private void hideWindow(AirMapMarker view) {
+        final BaiduMap map = view.getMap();
+        if (map != null) {
+            map.hideInfoWindow();
+        }
+    }
+
+    public WritableMap makeClickEventData(LatLng point, BaiduMap map) {
+        WritableMap event = new WritableNativeMap();
+
+        WritableMap coordinate = new WritableNativeMap();
+        coordinate.putDouble("latitude", point.latitude);
+        coordinate.putDouble("longitude", point.longitude);
+        event.putMap("coordinate", coordinate);
+
+        Projection projection = map.getProjection();
+        Point screenPoint = projection.toScreenLocation(point);
+
+        WritableMap position = new WritableNativeMap();
+        position.putDouble("x", screenPoint.x);
+        position.putDouble("y", screenPoint.y);
+        event.putMap("position", position);
+
+        return event;
     }
 
     @Override
@@ -187,5 +271,10 @@ public class AirMapMarkerManager extends ViewGroupManager<AirMapMarker> {
         float width = data.get("width");
         float height = data.get("height");
         view.update((int) width, (int) height);
+    }
+
+    void pushEvent(View view, String name, WritableMap data) {
+        reactContext.getJSModule(RCTEventEmitter.class)
+                .receiveEvent(view.getId(), name, data);
     }
 }

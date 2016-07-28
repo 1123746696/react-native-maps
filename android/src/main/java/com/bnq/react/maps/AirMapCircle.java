@@ -2,21 +2,24 @@ package com.bnq.react.maps;
 
 import android.content.Context;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.Circle;
+import com.baidu.mapapi.map.CircleOptions;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.map.Stroke;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.Overlay;
 
 public class AirMapCircle extends AirMapFeature {
 
-    private CircleOptions circleOptions;
-    private Circle circle;
+    private OverlayOptions circleOptions;
+    private Overlay circle;
 
     private LatLng center;
     private double radius;
     private int strokeColor;
-    private int fillColor;
-    private float strokeWidth;
+    private int fillColor = 1;
+    private int strokeWidth = 1;
     private float zIndex;
 
     public AirMapCircle(Context context) {
@@ -26,46 +29,48 @@ public class AirMapCircle extends AirMapFeature {
     public void setCenter(LatLng center) {
         this.center = center;
         if (circle != null) {
-            circle.setCenter(this.center);
+            ((Circle) circle).setCenter(this.center);
         }
     }
 
     public void setRadius(double radius) {
         this.radius = radius;
         if (circle != null) {
-            circle.setRadius(this.radius);
+            ((Circle) circle).setRadius((int)this.radius);
         }
     }
 
     public void setFillColor(int color) {
         this.fillColor = color;
         if (circle != null) {
-            circle.setFillColor(color);
+            ((Circle) circle).setFillColor(color);
         }
     }
 
     public void setStrokeColor(int color) {
         this.strokeColor = color;
+        Stroke stroke = new Stroke(strokeWidth, color);
         if (circle != null) {
-            circle.setStrokeColor(color);
+            ((Circle) circle).setStroke(stroke);
         }
     }
 
     public void setStrokeWidth(float width) {
-        this.strokeWidth = width;
+        this.strokeWidth = (int) width;
+        Stroke stroke = new Stroke(strokeWidth, strokeColor);
         if (circle != null) {
-            circle.setStrokeWidth(width);
+            ((Circle) circle).setStroke(stroke);
         }
     }
 
     public void setZIndex(float zIndex) {
         this.zIndex = zIndex;
         if (circle != null) {
-            circle.setZIndex(zIndex);
+            circle.setZIndex((int) zIndex);
         }
     }
 
-    public CircleOptions getCircleOptions() {
+    public OverlayOptions getCircleOptions() {
         if (circleOptions == null) {
             circleOptions = createCircleOptions();
         }
@@ -75,11 +80,12 @@ public class AirMapCircle extends AirMapFeature {
     private CircleOptions createCircleOptions() {
         CircleOptions options = new CircleOptions();
         options.center(center);
-        options.radius(radius);
+        options.radius((int) radius);
         options.fillColor(fillColor);
-        options.strokeColor(strokeColor);
-        options.strokeWidth(strokeWidth);
-        options.zIndex(zIndex);
+
+        Stroke stroke = new Stroke(strokeWidth, strokeColor);
+        options.stroke(stroke);
+        options.zIndex((int) zIndex);
         return options;
     }
 
@@ -89,12 +95,12 @@ public class AirMapCircle extends AirMapFeature {
     }
 
     @Override
-    public void addToMap(GoogleMap map) {
-        circle = map.addCircle(getCircleOptions());
+    public void addToMap(BaiduMap map) {
+        circle = map.addOverlay(getCircleOptions());
     }
 
     @Override
-    public void removeFromMap(GoogleMap map) {
+    public void removeFromMap(BaiduMap map) {
         circle.remove();
     }
 }

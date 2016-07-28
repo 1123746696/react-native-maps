@@ -3,10 +3,13 @@ package com.bnq.react.maps;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
@@ -25,19 +28,22 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.react.bridge.ReadableMap;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.Overlay;
 import javax.annotation.Nullable;
+
+import static android.widget.LinearLayout.VERTICAL;
 
 public class AirMapMarker extends AirMapFeature {
 
-    private MarkerOptions markerOptions;
-    private Marker marker;
+    private OverlayOptions markerOptions;
+    private Overlay marker;
     private int width;
     private int height;
 
@@ -64,6 +70,8 @@ public class AirMapMarker extends AirMapFeature {
     private float calloutAnchorX;
     private float calloutAnchorY;
     private boolean calloutAnchorIsSet;
+
+    private BaiduMap mBaiduMap;
 
     private boolean hasCustomMarkerView = false;
 
@@ -118,7 +126,7 @@ public class AirMapMarker extends AirMapFeature {
     public void setCoordinate(ReadableMap coordinate) {
         position = new LatLng(coordinate.getDouble("latitude"), coordinate.getDouble("longitude"));
         if (marker != null) {
-            marker.setPosition(position);
+            ((Marker) marker).setPosition(position);
         }
         update();
     }
@@ -126,7 +134,7 @@ public class AirMapMarker extends AirMapFeature {
     public void setTitle(String title) {
         this.title = title;
         if (marker != null) {
-            marker.setTitle(title);
+            ((Marker) marker).setTitle(title);
         }
         update();
     }
@@ -134,7 +142,9 @@ public class AirMapMarker extends AirMapFeature {
     public void setSnippet(String snippet) {
         this.snippet = snippet;
         if (marker != null) {
-            marker.setSnippet(snippet);
+            Bundle b = new Bundle();
+            b.putString("snippet", snippet);
+            marker.setExtraInfo(b);
         }
         update();
     }
@@ -142,7 +152,7 @@ public class AirMapMarker extends AirMapFeature {
     public void setRotation(float rotation) {
         this.rotation = rotation;
         if (marker != null) {
-            marker.setRotation(rotation);
+            ((Marker) marker).setRotate(rotation);
         }
         update();
     }
@@ -150,7 +160,7 @@ public class AirMapMarker extends AirMapFeature {
     public void setFlat(boolean flat) {
         this.flat = flat;
         if (marker != null) {
-            marker.setFlat(flat);
+            ((Marker) marker).setFlat(flat);
         }
         update();
     }
@@ -158,7 +168,7 @@ public class AirMapMarker extends AirMapFeature {
     public void setDraggable(boolean draggable) {
         this.draggable = draggable;
         if (marker != null) {
-            marker.setDraggable(draggable);
+            ((Marker) marker).setDraggable(draggable);
         }
         update();
     }
@@ -173,7 +183,7 @@ public class AirMapMarker extends AirMapFeature {
         anchorX = (float) x;
         anchorY = (float) y;
         if (marker != null) {
-            marker.setAnchor(anchorX, anchorY);
+            ((Marker) marker).setAnchor(anchorX, anchorY);
         }
         update();
     }
@@ -183,7 +193,7 @@ public class AirMapMarker extends AirMapFeature {
         calloutAnchorX = (float) x;
         calloutAnchorY = (float) y;
         if (marker != null) {
-            marker.setInfoWindowAnchor(calloutAnchorX, calloutAnchorY);
+            ((Marker) marker).setAnchor(calloutAnchorX, calloutAnchorY);
         }
         update();
     }
@@ -212,7 +222,7 @@ public class AirMapMarker extends AirMapFeature {
         }
     }
 
-    public MarkerOptions getMarkerOptions() {
+    public OverlayOptions getMarkerOptions() {
         if (markerOptions == null) {
             markerOptions = createMarkerOptions();
         }
@@ -235,14 +245,16 @@ public class AirMapMarker extends AirMapFeature {
     }
 
     @Override
-    public void addToMap(GoogleMap map) {
-        marker = map.addMarker(getMarkerOptions());
+    public void addToMap(BaiduMap map) {
+        marker = map.addOverlay(getMarkerOptions());
+        mBaiduMap = map;
     }
 
     @Override
-    public void removeFromMap(GoogleMap map) {
+    public void removeFromMap(BaiduMap map) {
         marker.remove();
         marker = null;
+        mBaiduMap = null;
     }
 
     private BitmapDescriptor getIcon() {
@@ -265,17 +277,21 @@ public class AirMapMarker extends AirMapFeature {
             return iconBitmapDescriptor;
         } else {
             // render the default marker pin
-            return BitmapDescriptorFactory.defaultMarker(this.markerHue);
+            TextView tv = new TextView(context);
+            tv.setText("      ");
+            tv.setTextSize(30);
+            tv.setBackgroundColor(Color.RED);
+            return BitmapDescriptorFactory.fromView(tv);
         }
     }
 
     private MarkerOptions createMarkerOptions() {
         MarkerOptions options = new MarkerOptions().position(position);
         if (anchorIsSet) options.anchor(anchorX, anchorY);
-        if (calloutAnchorIsSet) options.infoWindowAnchor(calloutAnchorX, calloutAnchorY);
+        if (calloutAnchorIsSet) options.anchor(calloutAnchorX, calloutAnchorY);
         options.title(title);
-        options.snippet(snippet);
-        options.rotation(rotation);
+        //options.snippet(snippet);
+        options.rotate(rotation);
         options.flat(flat);
         options.draggable(draggable);
         options.icon(getIcon());
@@ -287,18 +303,18 @@ public class AirMapMarker extends AirMapFeature {
             return;
         }
 
-        marker.setIcon(getIcon());
-        
+        ((Marker) marker).setIcon(getIcon());
+
         if (anchorIsSet) {
-            marker.setAnchor(anchorX, anchorY);
+            ((Marker) marker).setAnchor(anchorX, anchorY);
         } else {
-            marker.setAnchor(0.5f, 1.0f);
+            ((Marker) marker).setAnchor(0.5f, 1.0f);
         }
-        
+
         if (calloutAnchorIsSet) {
-            marker.setInfoWindowAnchor(calloutAnchorX, calloutAnchorY);
+            ((Marker) marker).setAnchor(calloutAnchorX, calloutAnchorY);
         } else {
-            marker.setInfoWindowAnchor(0.5f, 0);
+            ((Marker) marker).setAnchor(0.5f, 0);
         }
     }
 
@@ -364,7 +380,7 @@ public class AirMapMarker extends AirMapFeature {
         }
 
         LinearLayout LL = new LinearLayout(context);
-        LL.setOrientation(LinearLayout.VERTICAL);
+        LL.setOrientation(VERTICAL);
         LL.setLayoutParams(new LinearLayout.LayoutParams(
                 this.calloutView.width,
                 this.calloutView.height,
@@ -397,4 +413,35 @@ public class AirMapMarker extends AirMapFeature {
         return BitmapDescriptorFactory.fromResource(getDrawableResourceByName(name));
     }
 
+    public View getDefaultInfoView() {
+        LinearLayout layout = new LinearLayout(getContext());
+        layout.setOrientation(VERTICAL);
+        layout.setPadding(30, 20, 30, 20);
+        layout.setBackgroundColor(Color.RED);
+        TextView titleView = new TextView(getContext());
+        titleView.setText(title);
+        titleView.setTextSize(20);
+        layout.addView(titleView);
+
+        TextView infoView = new TextView(getContext());
+        infoView.setText(snippet);
+        infoView.setTextSize(20);
+        layout.addView(infoView);
+
+        return layout;
+    }
+
+    public View getInfoView() {
+        View v = getInfoContents();
+
+        if (v == null) {
+            v = getDefaultInfoView();
+        }
+
+        return v;
+    }
+
+    public BaiduMap getMap() {
+        return mBaiduMap;
+    }
 }
