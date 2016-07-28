@@ -20,7 +20,7 @@
 
 @class RCTBridge;
 
-@interface AIRMapMarker : BMKAnnotationView <MKAnnotation>
+@interface AIRMapMarker : BMKAnnotationView <BMKAnnotation>
 
 @property (nonatomic, strong) AIRMapCallout *calloutView;
 @property (nonatomic, weak) AIRMap *map;
@@ -42,7 +42,7 @@
 @property (nonatomic, copy) RCTDirectEventBlock onDragEnd;
 
 
-- (MKAnnotationView *)getAnnotationView;
+- (BMKAnnotationView *)getAnnotationView;
 - (void)fillCalloutView:(SMCalloutView *)calloutView;
 - (BOOL)shouldShowCalloutView;
 - (void)showCalloutView;

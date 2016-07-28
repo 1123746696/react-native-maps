@@ -16,11 +16,11 @@
 
 
 
-@interface AIRMapPolygon: BMKAnnotationView <MKOverlay>
+@interface AIRMapPolygon: BMKAnnotationView <BMKOverlay>
 
 @property (nonatomic, weak) AIRMap *map;
 
-@property (nonatomic, strong) MKPolygon *polygon;
+@property (nonatomic, strong) BMKPolygon *polygon;
 @property (nonatomic, strong) MKPolygonRenderer *renderer;
 
 @property (nonatomic, strong) NSArray<AIRMapCoordinate *> *coordinates;
@@ -36,8 +36,8 @@
 #pragma mark MKOverlay protocol
 
 @property(nonatomic, readonly) CLLocationCoordinate2D coordinate;
-@property(nonatomic, readonly) MKMapRect boundingMapRect;
-- (BOOL)intersectsMapRect:(MKMapRect)mapRect;
+@property(nonatomic, readonly) BMKMapRect boundingMapRect;
+- (BOOL)intersectsMapRect:(BMKMapRect)mapRect;
 - (BOOL)canReplaceMapContent;
 
 @end

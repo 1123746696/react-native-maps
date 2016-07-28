@@ -58,7 +58,7 @@
     {
         coords[i] = coordinates[i].coordinate;
     }
-    self.polyline = [MKPolyline polylineWithCoordinates:coords count:coordinates.count];
+    self.polyline = [BMKPolyline polylineWithCoordinates:coords count:coordinates.count];
     self.renderer = [[MKPolylineRenderer alloc] initWithPolyline:self.polyline];
     [self update];
 }
@@ -88,12 +88,12 @@
     return self.polyline.coordinate;
 }
 
-- (MKMapRect) boundingMapRect
+- (BMKMapRect) boundingMapRect
 {
     return self.polyline.boundingMapRect;
 }
 
-- (BOOL)intersectsMapRect:(MKMapRect)mapRect
+- (BOOL)intersectsMapRect:(BMKMapRect)mapRect
 {
     BOOL answer = [self.polyline intersectsMapRect:mapRect];
     return answer;

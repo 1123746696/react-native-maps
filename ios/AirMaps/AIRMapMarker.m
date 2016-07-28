@@ -21,7 +21,7 @@
 @implementation AIRMapMarker {
     BOOL _hasSetCalloutOffset;
     RCTImageLoaderCancellationBlock _reloadImageCancellationBlock;
-    MKPinAnnotationView *_pinView;
+    BMKPinAnnotationView *_pinView;
 }
 
 - (void)reactSetFrame:(CGRect)frame
@@ -72,6 +72,8 @@
         if (_pinView == nil) {
             _pinView = [[BMKPinAnnotationView alloc] initWithAnnotation:self reuseIdentifier: nil];
             _pinView.annotation = self;
+            _pinView.canShowCallout=false;
+        
         }
 
         _pinView.draggable = self.draggable;
@@ -79,8 +81,8 @@
         // TODO(lmr): Looks like this API was introduces in iOS 8. We may want to handle differently for earlier
         // versions. Right now it's just leaving it with the default color. People needing the colors are free to
         // use their own custom markers.
-        if ([_pinView respondsToSelector:@selector(setPinTintColor:)]) {
-            _pinView.pinTintColor = self.pinColor;
+        if ([_pinView respondsToSelector:@selector(setPinColor:)]) {
+            _pinView.pinColor = self.pinColor;
         }
 
         return _pinView;
@@ -99,7 +101,7 @@
 
     // Apply the MKAnnotationView's desired calloutOffset (from the top-middle of the view)
     if ([self shouldUsePinView] && !_hasSetCalloutOffset) {
-        calloutView.calloutOffset = CGPointMake(-8,0);
+        calloutView.calloutOffset = CGPointMake(0,0);
     } else {
         calloutView.calloutOffset = self.calloutOffset;
     }
@@ -134,7 +136,7 @@
 
 - (void)showCalloutView
 {
-    MKAnnotationView *annotationView = [self getAnnotationView];
+    BMKAnnotationView *annotationView = [self getAnnotationView];
 
     [self setSelected:YES animated:NO];
 
@@ -230,8 +232,8 @@
 {
     _pinColor = pinColor;
     
-    if ([_pinView respondsToSelector:@selector(setPinTintColor:)]) {
-        _pinView.pinTintColor = _pinColor;
+    if ([_pinView respondsToSelector:@selector(setPinColor:)]) {
+        _pinView.pinColor = _pinColor;
     }
 }
 

@@ -91,15 +91,15 @@ const CGFloat AIRMapZoomBoundBuffer = 0.01;
     // Our desired API is to pass up markers/overlays as children to the mapview component.
     // This is where we intercept them and do the appropriate underlying mapview action.
     if ([subview isKindOfClass:[AIRMapMarker class]]) {
-        [self addAnnotation:(id <MKAnnotation>) subview];
+        [self addAnnotation:(id <BMKAnnotation>) subview];
     } else if ([subview isKindOfClass:[AIRMapPolyline class]]) {
         ((AIRMapPolyline *)subview).map = self;
-        [self addOverlay:(id<MKOverlay>)subview];
+        [self addOverlay:(id<BMKOverlay>)subview];
     } else if ([subview isKindOfClass:[AIRMapPolygon class]]) {
         ((AIRMapPolygon *)subview).map = self;
-        [self addOverlay:(id<MKOverlay>)subview];
+        [self addOverlay:(id<BMKOverlay>)subview];
     } else if ([subview isKindOfClass:[AIRMapCircle class]]) {
-        [self addOverlay:(id<MKOverlay>)subview];
+        [self addOverlay:(id<BMKOverlay>)subview];
     }
     [_reactSubviews insertObject:(UIView *)subview atIndex:(NSUInteger) atIndex];
 }
@@ -108,13 +108,13 @@ const CGFloat AIRMapZoomBoundBuffer = 0.01;
     // similarly, when the children are being removed we have to do the appropriate
     // underlying mapview action here.
     if ([subview isKindOfClass:[AIRMapMarker class]]) {
-        [self removeAnnotation:(id<MKAnnotation>)subview];
+        [self removeAnnotation:(id<BMKAnnotation>)subview];
     } else if ([subview isKindOfClass:[AIRMapPolyline class]]) {
-        [self removeOverlay:(id <MKOverlay>) subview];
+        [self removeOverlay:(id <BMKOverlay>) subview];
     } else if ([subview isKindOfClass:[AIRMapPolygon class]]) {
-        [self removeOverlay:(id <MKOverlay>) subview];
+        [self removeOverlay:(id <BMKOverlay>) subview];
     } else if ([subview isKindOfClass:[AIRMapCircle class]]) {
-        [self removeOverlay:(id <MKOverlay>) subview];
+        [self removeOverlay:(id <BMKOverlay>) subview];
     }
     [_reactSubviews removeObject:(UIView *)subview];
 }

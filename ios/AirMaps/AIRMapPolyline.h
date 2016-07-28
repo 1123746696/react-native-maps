@@ -15,11 +15,11 @@
 #import "RCTView.h"
 
 
-@interface AIRMapPolyline: BMKAnnotationView <MKOverlay>
+@interface AIRMapPolyline: BMKAnnotationView <BMKOverlay>
 
 @property (nonatomic, weak) AIRMap *map;
 
-@property (nonatomic, strong) MKPolyline *polyline;
+@property (nonatomic, strong) BMKPolyline *polyline;
 @property (nonatomic, strong) MKPolylineRenderer *renderer;
 
 @property (nonatomic, strong) NSArray<AIRMapCoordinate *> *coordinates;
@@ -35,8 +35,8 @@
 #pragma mark MKOverlay protocol
 
 @property(nonatomic, readonly) CLLocationCoordinate2D coordinate;
-@property(nonatomic, readonly) MKMapRect boundingMapRect;
-- (BOOL)intersectsMapRect:(MKMapRect)mapRect;
+@property(nonatomic, readonly) BMKMapRect boundingMapRect;
+- (BOOL)intersectsMapRect:(BMKMapRect)mapRect;
 - (BOOL)canReplaceMapContent;
 
 @end
