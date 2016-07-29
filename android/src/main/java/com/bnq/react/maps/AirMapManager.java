@@ -1,9 +1,14 @@
 package com.bnq.react.maps;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.content.Context;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -19,6 +24,11 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.SDKInitializer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -29,6 +39,7 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
     private static final int ANIMATE_TO_REGION = 1;
     private static final int ANIMATE_TO_COORDINATE = 2;
     private static final int FIT_TO_ELEMENTS = 3;
+    private static final int TAKE_SNAPSHOT = 4;
 
     private final Map<String, Integer> MAP_TYPES = MapBuilder.of(
             "standard", BaiduMap.MAP_TYPE_NORMAL,
@@ -206,6 +217,39 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
             case FIT_TO_ELEMENTS:
                 view.fitToElements(args.getBoolean(0));
                 break;
+            case TAKE_SNAPSHOT:
+                Log.v("test", "snap");
+                view.map.snapshotScope(new Rect(0, 0, args.getInt(0), args.getInt(1)),
+                        new BaiduMap.SnapshotReadyCallback() {
+                            @Override
+                            public void onSnapshotReady(Bitmap bitmap) {
+                                Log.v("test", "onSnapshotReady");
+                                saveBitmap(bitmap);
+                            }
+                        });
+                break;
+        }
+    }
+
+    public void saveBitmap(Bitmap bmp) {
+        File folder = new File("/sdcard/snapshot/");
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        File f = new File(folder.getAbsolutePath(), System.currentTimeMillis() + ".jpg");
+
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -238,7 +282,8 @@ public class AirMapManager extends ViewGroupManager<AirMapView> {
         return MapBuilder.of(
                 "animateToRegion", ANIMATE_TO_REGION,
                 "animateToCoordinate", ANIMATE_TO_COORDINATE,
-                "fitToElements", FIT_TO_ELEMENTS
+                "fitToElements", FIT_TO_ELEMENTS,
+                "takeSnapshot", TAKE_SNAPSHOT
         );
     }
 
