@@ -7,13 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -22,14 +20,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.Circle;
-import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
-import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -39,6 +33,7 @@ import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.Projection;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
+import com.baidu.mapapi.utils.DistanceUtil;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
@@ -318,21 +313,28 @@ public class AirMapView extends LinearLayout implements BaiduMap.OnMarkerDragLis
         Double lngDelta = region.getDouble("longitudeDelta");
         Double latDelta = region.getDouble("latitudeDelta");
 
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        LatLngBounds bounds = builder
-                .include(new LatLng(lat - latDelta / 2, lng - lngDelta / 2))
-                .include(new LatLng(lat + latDelta / 2, lng + lngDelta / 2))
-                .build();
+        int zoomLevel[] = {2000000,1000000,500000,200000,100000,
+                50000,25000,20000,10000,5000,2000,1000,500,100,50,20,0};
+
+        double distance = DistanceUtil.getDistance(new LatLng(lat + latDelta, lng + lngDelta),
+                new LatLng(lat - latDelta, lng - lngDelta));
+        int i = 0;
+        for (i = 0; i < 17; i++) {
+            if (zoomLevel[i] < distance) {
+                break;
+            }
+        }
+        float zoom = i + 4;
 
         if (mapView.getHeight() <= 0 || mapView.getWidth() <= 0) {
             // in this case, our map has not been laid out yet, so we save the bounds in a local
             // variable, and make a guess of zoomLevel 10. Not to worry, though: as soon as layout
             // occurs, we will move the camera to the saved bounds. Note that if we tried to move
             // to the bounds now, it would trigger an exception.
-            map.setMapStatus(MapStatusUpdateFactory.newLatLngBounds(bounds));
-            boundsToMove = bounds;
+            map.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 10));
+            boundsToMove = null;
         } else {
-            map.setMapStatus(MapStatusUpdateFactory.newLatLngBounds(bounds));
+            map.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoom));
             boundsToMove = null;
         }
     }
@@ -501,15 +503,15 @@ public class AirMapView extends LinearLayout implements BaiduMap.OnMarkerDragLis
     }
 
     public void animateToRegion(LatLngBounds bounds, int duration) {
+
         startMonitoringRegion();
-//        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0), duration, null);
         MapStatusUpdate cu = MapStatusUpdateFactory.newLatLngBounds(bounds);
         map.animateMapStatus(cu);
     }
 
     public void animateToCoordinate(LatLng coordinate, int duration) {
+
         startMonitoringRegion();
-//        map.animateCamera(CameraUpdateFactory.newLatLng(coordinate), duration, null);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(coordinate);
         LatLngBounds bounds = builder.build();
@@ -529,6 +531,7 @@ public class AirMapView extends LinearLayout implements BaiduMap.OnMarkerDragLis
         }
         LatLngBounds bounds = builder.build();
         MapStatusUpdate cu = MapStatusUpdateFactory.newLatLngBounds(bounds);
+
         if (animated) {
             startMonitoringRegion();
             map.animateMapStatus(cu);
@@ -605,6 +608,7 @@ public class AirMapView extends LinearLayout implements BaiduMap.OnMarkerDragLis
                     .include(rightUp)
                     .include(rightDown)
                     .build();
+
 
             if (lastBoundsEmitted == null ||
                     LatLngBoundsUtils.BoundsAreDifferent(bounds, lastBoundsEmitted)) {
