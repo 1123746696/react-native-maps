@@ -326,7 +326,7 @@ var MapView = React.createClass({
 
   getInitialState: function() {
     return {
-      isReady: Platform.OS === 'ios',
+      isReady: true,//Platform.OS === 'ios',
     };
   },
 
