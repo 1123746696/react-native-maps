@@ -23,6 +23,7 @@
     RCTImageLoaderCancellationBlock _reloadImageCancellationBlock;
     BMKPinAnnotationView *_pinView;
 }
+@synthesize calloutOffset=_calloutOffset;
 
 - (void)reactSetFrame:(CGRect)frame
 {
@@ -190,7 +191,8 @@
 - (void)setCalloutOffset:(CGPoint)calloutOffset
 {
     _hasSetCalloutOffset = YES;
-    [super setCalloutOffset:calloutOffset];
+//    [super setCalloutOffset:calloutOffset];
+    _calloutOffset=calloutOffset;
 }
 
 - (BOOL)shouldShowCalloutView

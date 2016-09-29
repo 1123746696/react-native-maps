@@ -7,6 +7,12 @@
 
 
 @implementation AIRMapCallout {
-
+}
+- (void)layoutSubviews{
+    if (self.subviews&&self.subviews.count>0) {
+        UIView *subview = [self.subviews objectAtIndex:0];
+//        self.frame=CGRectMake(self.frame.origin.x, self.frame.origin.y, subview.frame.size.width, subview.frame.size.height);
+        self.frame=subview.frame;
+    }
 }
 @end

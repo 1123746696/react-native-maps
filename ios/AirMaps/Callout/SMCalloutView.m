@@ -61,7 +61,6 @@ NSTimeInterval const kSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
         self.containerView = [UIButton new];
         self.containerView.isAccessibilityElement = NO;
         self.isAccessibilityElement = NO;
-        self.contentViewInset = UIEdgeInsetsMake(12, 12, 12, 12);
 
         [self.containerView addTarget:self action:@selector(highlightIfNecessary) forControlEvents:UIControlEventTouchDown | UIControlEventTouchDragInside];
         [self.containerView addTarget:self action:@selector(unhighlightIfNecessary) forControlEvents:UIControlEventTouchDragOutside | UIControlEventTouchCancel | UIControlEventTouchUpOutside | UIControlEventTouchUpInside];
@@ -265,7 +264,7 @@ NSTimeInterval const kSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
 
 // this private method handles both CALayer and UIView parents depending on what's passed.
 - (void)presentCalloutFromRect:(CGRect)rect inLayer:(CALayer *)layer ofView:(UIView *)view constrainedToLayer:(CALayer *)constrainedLayer animated:(BOOL)animated {
-
+    [self layoutSubviews];
     // Sanity check: dismiss this callout immediately if it's displayed somewhere
     if (self.layer.superlayer) [self dismissCalloutAnimated:NO];
 
@@ -512,10 +511,10 @@ NSTimeInterval const kSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
 }
 
 - (void)layoutSubviews {
-
-    self.containerView.frame = self.bounds;
+    [self.contentView layoutSubviews];
+    self.containerView.frame = self.contentView.bounds;
+//    self.backgroundView.frame = self.contentView.bounds;
     self.backgroundView.frame = self.bounds;
-
     // if we're pointing up, we'll need to push almost everything down a bit
     CGFloat dy = self.currentArrowDirection == SMCalloutArrowDirectionUp ? TOP_ANCHOR_MARGIN : 0;
 
