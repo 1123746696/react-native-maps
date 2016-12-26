@@ -219,6 +219,7 @@
                                                                          clipped:YES
                                                                       resizeMode:UIViewContentModeCenter
                                                                    progressBlock:nil
+                                                                partialLoadBlock:nil
                                                                  completionBlock:^(NSError *error, UIImage *image) {
                                                                      if (error) {
                                                                          // TODO(lmr): do something with the error?
@@ -228,6 +229,7 @@
                                                                          self.image = image;
                                                                      });
                                                                  }];
+
 }
 
 - (void)setPinColor:(UIColor *)pinColor
