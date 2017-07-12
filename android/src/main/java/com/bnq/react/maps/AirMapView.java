@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.Circle;
 import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -161,7 +162,23 @@ public class AirMapView extends LinearLayout implements BaiduMap.OnMarkerDragLis
         map.setOnMarkerDragListener(this);
 
 //        manager.pushEvent(this, "onMapReady", new WritableNativeMap());
+        //地图状态监听事件
+        map.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
+            @Override
+            public void onMapStatusChangeStart(MapStatus mapStatus) {
 
+            }
+
+            @Override
+            public void onMapStatusChange(MapStatus mapStatus) {
+
+            }
+
+            @Override
+            public void onMapStatusChangeFinish(MapStatus mapStatus) {
+                view.startMonitoringRegion();
+            }
+        });
         map.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
