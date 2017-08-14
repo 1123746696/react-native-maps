@@ -93,9 +93,11 @@ public class AirMapMarker extends AirMapFeature {
                                 CloseableStaticBitmap closeableStaticBitmap = (CloseableStaticBitmap) image;
                                 Bitmap bitmap = closeableStaticBitmap.getUnderlyingBitmap();
                                 if (bitmap != null) {
-                                    bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                                    bitmap = bitmap.copy(Bitmap.Config.ARGB_4444, true);
                                     iconBitmap = bitmap;
                                     iconBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
+                                    bitmap.recycle();
+                                    bitmap = null;
                                 }
                             }
                         }
@@ -255,6 +257,14 @@ public class AirMapMarker extends AirMapFeature {
         marker.remove();
         marker = null;
         mBaiduMap = null;
+        if (iconBitmap != null) {
+            iconBitmap.recycle();
+            iconBitmap = null;
+        }
+        if (iconBitmapDescriptor != null) {
+            iconBitmapDescriptor.recycle();
+            iconBitmapDescriptor = null;
+        }
     }
 
     private BitmapDescriptor getIcon() {
@@ -328,7 +338,7 @@ public class AirMapMarker extends AirMapFeature {
         int width = this.width <= 0 ? 100 : this.width;
         int height = this.height <= 0 ? 100 : this.height;
         this.buildDrawingCache();
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
 
         Canvas canvas = new Canvas(bitmap);
         this.draw(canvas);

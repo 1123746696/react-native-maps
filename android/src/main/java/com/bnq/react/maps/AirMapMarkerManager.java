@@ -140,7 +140,7 @@ public class AirMapMarkerManager extends ViewGroupManager<AirMapMarker> {
     @Override
     public void removeViewAt(AirMapMarker parent, int index) {
         super.removeViewAt(parent, index);
-        parent.update();
+//        parent.update();
     }
 
     @Override
