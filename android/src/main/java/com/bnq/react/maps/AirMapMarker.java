@@ -96,8 +96,8 @@ public class AirMapMarker extends AirMapFeature {
                                     bitmap = bitmap.copy(Bitmap.Config.ARGB_4444, true);
                                     iconBitmap = bitmap;
                                     iconBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-                                    bitmap.recycle();
-                                    bitmap = null;
+//                                    bitmap.recycle();
+//                                    bitmap = null;
                                 }
                             }
                         }
@@ -257,14 +257,14 @@ public class AirMapMarker extends AirMapFeature {
         marker.remove();
         marker = null;
         mBaiduMap = null;
-        if (iconBitmap != null) {
-            iconBitmap.recycle();
-            iconBitmap = null;
-        }
-        if (iconBitmapDescriptor != null) {
-            iconBitmapDescriptor.recycle();
-            iconBitmapDescriptor = null;
-        }
+//        if (iconBitmap != null) {
+//            iconBitmap.recycle();
+//            iconBitmap = null;
+//        }
+//        if (iconBitmapDescriptor != null) {
+//            iconBitmapDescriptor.recycle();
+//            iconBitmapDescriptor = null;
+//        }
     }
 
     private BitmapDescriptor getIcon() {
