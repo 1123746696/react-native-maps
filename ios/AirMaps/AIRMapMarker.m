@@ -85,7 +85,33 @@
         if ([_pinView respondsToSelector:@selector(setPinColor:)]) {
             _pinView.pinColor = self.pinColor;
         }
-
+        if(self.onPress){
+            _pinView.enabled=false;
+            NSArray *gess = [self gestureRecognizers];
+            for (UIGestureRecognizer *ges in gess) {
+                [_pinView addGestureRecognizer:ges];
+            }
+        }
+        if (_reloadImageCancellationBlock) {
+            _reloadImageCancellationBlock();
+            _reloadImageCancellationBlock = nil;
+        }
+        _reloadImageCancellationBlock = [_bridge.imageLoader loadImageWithURLRequest:[RCTConvert NSURLRequest:_imageSrc]
+                                                                                size:self.bounds.size
+                                                                               scale:RCTScreenScale()
+                                                                             clipped:YES
+                                                                          resizeMode:UIViewContentModeCenter
+                                                                       progressBlock:nil
+                                                                    partialLoadBlock:nil
+                                                                     completionBlock:^(NSError *error, UIImage *image) {
+                                                                         if (error) {
+                                                                             // TODO(lmr): do something with the error?
+                                                                             NSLog(@"%@", error);
+                                                                         }
+                                                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                                                             _pinView.image = image;
+                                                                         });
+                                                                     }];
         return _pinView;
     } else {
         // If it has subviews, it means we are wanting to render a custom marker with arbitrary react views.
@@ -202,7 +228,7 @@
 
 - (BOOL)shouldUsePinView
 {
-    return self.reactSubviews.count == 0 && !self.imageSrc;
+    return self.reactSubviews.count == 0;
 }
 
 - (void)setImageSrc:(NSString *)imageSrc

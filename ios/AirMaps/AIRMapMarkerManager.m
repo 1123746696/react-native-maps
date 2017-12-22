@@ -82,6 +82,9 @@ RCT_EXPORT_METHOD(hideCallout:(nonnull NSNumber *)reactTag)
 - (void)_handleTap:(UITapGestureRecognizer *)recognizer {
     AIRMapMarker *marker = (AIRMapMarker *)recognizer.view;
     if (!marker) return;
+    if([marker isKindOfClass:[BMKPinAnnotationView class]]){
+        marker = (AIRMapMarker *)marker.annotation;
+    }
 
     if (marker.selected) {
         CGPoint touchPoint = [recognizer locationInView:marker.map.calloutView];
