@@ -21,11 +21,7 @@
     "mapkit"
   ],
   "dependencies": {
-    "react": "*",
-    "react-native": "*"
   },
   "devDependencies": {
-    "react": "15.2.0",
-    "react-native": "0.29.0"
   }
 }
