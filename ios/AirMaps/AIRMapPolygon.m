@@ -4,8 +4,12 @@
 //
 
 #import "AIRMapPolygon.h"
-#import "UIView+React.h"
 
+#if __has_include(<React/RCTAssert.h>)
+#import <React/UIView+React.h>
+#else
+#import "UIView+React.h"
+#endif
 
 @implementation AIRMapPolygon {
 

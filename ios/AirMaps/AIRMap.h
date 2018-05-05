@@ -10,7 +10,7 @@
 
 #import <UIKit/UIKit.h>
 #import <BaiduMapAPI_Map/BMKMapComponent.h>  
-#import "RCTConvert+MapKit.h"
+#import "RCTConvert+AirMap.h"
 #import "RCTComponent.h"
 #import "SMCalloutView.h"
 

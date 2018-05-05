@@ -9,11 +9,21 @@
 
 #import "AIRMapMarker.h"
 
+
+#if __has_include(<React/RCTAssert.h>)
+#import <React/RCTBridge.h>
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTImageLoader.h>
+#import <React/RCTUtils.h>
+#import <React/UIView+React.h>
+#else
 #import "RCTEventDispatcher.h"
 #import "UIView+React.h"
 #import "RCTBridge.h"
 #import "RCTUtils.h"
 #import "RCTImageLoader.h"
+#endif
+
 
 @implementation EmptyCalloutBackgroundView
 @end

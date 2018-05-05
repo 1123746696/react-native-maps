@@ -11,9 +11,12 @@
 
 #import "RCTUIManager.h"
 #import "RCTConvert+CoreLocation.h"
-#import "UIView+React.h"
 #import "AIRMapMarker.h"
-
+#if __has_include(<React/RCTAssert.h>)
+#import <React/UIView+React.h>
+#else
+#import "UIView+React.h"
+#endif
 @interface AIRMapMarkerManager () <BMKMapViewDelegate>
 
 @end
