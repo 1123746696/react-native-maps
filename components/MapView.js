@@ -31,6 +31,7 @@ export default class MapView extends Component{
       region: true,
     },
   }
+  static
   statics= {
     BMapManager,
   }
@@ -323,6 +324,18 @@ export default class MapView extends Component{
   }
   constructor(props: any) {
     super(props);
+    this._onMapReady = this._onMapReady.bind(this)
+    this._onLayout = this._onLayout.bind(this)
+    this._onChange = this._onChange.bind(this)
+    this.animateToRegion = this.animateToRegion.bind(this)
+    this.animateToCoordinate = this.animateToCoordinate.bind(this)
+    this.fitToElements = this.fitToElements.bind(this)
+    this.takeSnapshot = this.takeSnapshot.bind(this)
+
+    this._getHandle = this._getHandle.bind(this)
+    this._runCommand = this._runCommand.bind(this)
+
+
     this.state = {
       isReady: true,//Platform.OS === 'ios',
     };

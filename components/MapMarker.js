@@ -203,7 +203,14 @@ export default class MapMarker extends Component{
       onDragEnd: PropTypes.func,
 
       }
-
+    constructor(props: any) {
+        super(props);
+        this.showCallout = this.showCallout.bind(this)
+        this.hideCallout = this.hideCallout.bind(this)
+        this._getHandle = this._getHandle.bind(this)
+        this._runCommand = this._runCommand.bind(this)
+        this._onPress = this._onPress.bind(this)
+    }
   showCallout() {
       this._runCommand('showCallout', []);
   }
