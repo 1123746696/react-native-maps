@@ -22,7 +22,7 @@ public class MapsPackage implements ReactPackage {
         return Arrays.<NativeModule>asList(
                 bMapManager);
     }
-    @Override
+    // deprecated >= RN 0.47.0
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }
