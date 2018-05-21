@@ -41,7 +41,7 @@ export default class MapView extends Component{
      * Used to style and layout the `MapView`.  See `StyleSheet.js` and
      * `ViewStylePropTypes.js` for more info.
      */
-    style: View.propTypes.style,
+//     style: View.propTypes.style,
 
     /**
      * If `true` the app will ask for the user's location.
