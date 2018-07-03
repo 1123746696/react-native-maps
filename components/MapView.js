@@ -352,13 +352,13 @@ export default class MapView extends Component{
   componentWillUpdate(nextProps) {
     var a = this.__lastRegion;
     var b = nextProps.region;
-    if (!a || !b) return;
-    if (
-        a.latitude !== b.latitude ||
-        a.longitude !== b.longitude ||
-        a.latitudeDelta !== b.latitudeDelta ||
-        a.longitudeDelta !== b.longitudeDelta
-    ) {
+    if (!b) return;
+    if (!a ||
+          a.latitude !== b.latitude ||
+          a.longitude !== b.longitude ||
+          a.latitudeDelta !== b.latitudeDelta ||
+          a.longitudeDelta !== b.longitudeDelta
+          ) {
       this.map.setNativeProps({ region: b });
     }
   }
