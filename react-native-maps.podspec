@@ -12,4 +12,5 @@ Pod::Spec.new do |s|
   s.source_files  = "ios/AirMaps/**/*.{h,m}"
 
   s.dependency 'React'
+  s.dependency 'BaiduMapKit','3.4.4'
 end
